@@ -1,0 +1,9 @@
+$TTL 3600
+@       IN SOA ns1.lab.example. admin.lab.example. (
+                2024010100 ; Serial
+                3600 ; Refresh
+                600 ; Retry
+                86400 ; Expire
+                3600 ) ; Minimum
+@       IN NS ns1.lab.example.
+ns1     IN A 10.0.0.1

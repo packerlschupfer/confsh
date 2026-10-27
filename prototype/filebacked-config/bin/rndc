@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "  [rndc] $*"
+exit 0

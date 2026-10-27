@@ -1,0 +1,3 @@
+#!/bin/sh
+# PoC stub: a real named-checkzone parses the zone; here we just require an SOA.
+grep -qi 'SOA' "$2" && { echo "zone $1/IN: loaded serial OK (stub)"; exit 0; } || { echo "stub: $2 has no SOA"; exit 1; }
