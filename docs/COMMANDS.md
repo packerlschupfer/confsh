@@ -97,6 +97,22 @@ forwards created in LuCI don't appear here, but they are still listed by
 Interface names map to firewall zones: `wan-interface eth0` uses the
 zone containing the network interface whose device is `eth0`.
 
+**`service dns`** (dnsmasq backend) → `/etc/config/dhcp`:
+
+```text
+set service dns forwarding cache-size 1000
+set service dns forwarding name-server 1.1.1.1
+set service dns forwarding listen-on lan
+set service dns host nas.lan address 192.168.1.10
+set service dns cname www.lan target nas.lan
+```
+
+`forwarding` maps to the dnsmasq instance (`cachesize`/`server`/`interface`);
+`host` and `cname` become `config domain` / `config cname` records. This is
+the **UCI-native DNS backend** — authoritative backends (bind, PowerDNS) would
+expose the same `service dns` grammar through a backend-driver interface rather
+than UCI (see the DNS-backends design issue).
+
 Next up: `service nat` and `interfaces ethernet … vif` (confsh), and
 `interfaces wireguard`, `vpn ipsec`, `interfaces openvpn` and
 `interfaces tunnel` (contributed). Module authors: see
