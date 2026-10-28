@@ -1,0 +1,22 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# bind backend driver for confsh's `service dns` record ops.
+# Applies changes via nsupdate over TSIG — NOT by editing zone files — so deletes
+# work, bind keeps its journal, and there is no rndc freeze/thaw file hazard.
+# This is the "non-UCI backend driver" half of the backend-driver design
+# (halcycon/confsh#8): it serves the same `service dns host|cname …` grammar the
+# dnsmasq (UCI) driver does, but lands records in bind instead.
+: "${SRV:=127.0.0.1}" "${PORT:=5354}" "${ZONE:=lab.example}" "${KEY:=/tmp/dnslab/svc-dns.key}" "${TTL:=300}"
+cmd=$1; name=$2; val=$3
+{
+  echo "server $SRV $PORT"
+  echo "zone $ZONE."
+  case "$cmd" in
+    host-add)  echo "update delete $name. A";     echo "update add $name. $TTL A $val" ;;
+    host-del)  echo "update delete $name. A" ;;
+    cname-add) echo "update delete $name. CNAME"; echo "update add $name. $TTL CNAME $val." ;;
+    cname-del) echo "update delete $name. CNAME" ;;
+    *) echo "usage: dns-bind host-add|host-del|cname-add|cname-del <name> [val]" >&2; exit 2 ;;
+  esac
+  echo "send"
+} | nsupdate -k "$KEY"
